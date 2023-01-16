@@ -1,13 +1,9 @@
-import os
 import threading
-import sys
 from datetime import datetime
 import time
 
 # liste des commandes
 def h():
-    afficher_heure()
-def heure():
     afficher_heure()
 def afficher_heure():
     global heure
@@ -23,9 +19,11 @@ def changer_alarme(heures, minutes, secondes):
 def afficher_alarme():
     global alarme
     format_alarme = "{:02d}:{:02d}:{:02d}"
-    print("Alarme définie pour:",format_alarme.format(alarme[0], alarme[1], alarme[2]))
+    print("Alarme définie pour:", format_alarme.format(alarme[0], alarme[1], alarme[2]))
+def al():
+    afficher_alarme()
 def liste():
-    print("Liste des commandes valides:\n- liste()\n- afficher_heure() | heure() | h()\n- changer_heure(HEURES, MINUTES, SECONDES)\n- changer_alarme(HEURES, MINUTES, SECONDES)\n- afficher_alarme()\n- pause()\n- continuer()\n")
+    print("Liste des commandes valides:\n- liste()\n- afficher_heure() | h()\n- changer_heure(HEURES, MINUTES, SECONDES)\n- afficher_alarme() | al()\n- changer_alarme(HEURES, MINUTES, SECONDES)\n- pause()\n- continuer()\n")
 def pause():
     global heure_active
     heure_active = False
@@ -36,22 +34,21 @@ def continuer():
 def verifier_alarme():
     global heure
     global alarme
-    global alarme_activee
     if heure[0] == alarme[0] and heure[1] == alarme[1] and heure[2] == alarme[2]:
-        alarme_activee = True
+        return True
     else:
-        alarme_activee = False
+        return False
 
 def actualiser_heure():
     global heure
     heure[2] += 1
-    if heure[2] >= 60:
+    if heure[2] >= 60 or heure[2] < 0:
         heure[2] = 0
         heure[1] += 1
-    if heure[1] >= 60:
+    if heure[1] >= 60 or heure[1] < 0:
         heure[1] = 0
         heure[0] += 1
-    if heure[0] >= 24:
+    if heure[0] >= 24 or heure[0] < 0:
         heure[0] = 0
 
 def thread_heure():
@@ -59,7 +56,7 @@ def thread_heure():
     while True:
         if heure_active:
             verifier_alarme()
-            if alarme_activee:
+            if verifier_alarme():
                 message = message + "Il est l'heure !"
                 print()
             time.sleep(1)
@@ -69,13 +66,10 @@ def thread_heure():
 heure = [datetime.now().hour, datetime.now().minute, datetime.now().second]
 heure_active = True
 alarme = [-1, -1, -1]
-alarme_activee = False
 
 def horloge():
     input_thread = threading.Thread(target=thread_heure, args=())
     input_thread.start()
-    global heure
-    global alarme_activee
     print("Bienvenue dans l'HORLOGE !\nPour obtenir une liste des commandes disponibles, entrez \"liste()\".")
     while True:
         message = "Entrez une commande\n"
